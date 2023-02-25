@@ -333,6 +333,32 @@ const getRestaurantes = async (req, res) => {
   }
 };
 
+// Controlador para obtener restaurantes a partir de un nombre
+const getRestaurantePorNombre = async (req, res) => {
+  const nombre = req.params.nombre;
+  try {
+    const restauranteBD = await Restaurante.find({
+      nombre: { $regex: nombre, $options: "i" },
+    });
+    if (!restauranteBD) {
+      return res.status(404).json({
+        ok: false,
+        msg: `No existe un restaurante con el nombre ${nombre}`,
+      });
+    }
+
+    res.status(200).json({
+      ok: true,
+      restaurante: restauranteBD,
+    });
+  } catch (error) {
+    return res.json({
+      ok: false,
+      msg: `No se ha podido obtener el restaurante con nombre ${nombre}`,
+    });
+  }
+};
+
 // Controlador para borrar un restaurante (borra por id)
 const borrarRestaurante = async (req, res) => {
   const _id = req.params.id;
@@ -413,4 +439,5 @@ module.exports = {
   borrarRestaurante,
   revalidarToken,
   subirImagen,
+  getRestaurantePorNombre,
 };

@@ -30,7 +30,8 @@ const UsuarioSchema = Schema({
   },
   fechaNacimiento: {
     //? Formato de fecha 'año-mes-dia' EJ: '1999-04-11'
-    type: Date,
+    // FIXME: Asignar formato de fecha correctamente en calendario y asignar tipo Date
+    type: String,
     required: true,
   },
   google: {

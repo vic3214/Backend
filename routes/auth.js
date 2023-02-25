@@ -11,6 +11,7 @@ const {
   editarRestaurante,
   getRestaurantes,
   subirImagen,
+  getRestaurantePorNombre,
 } = require("../controllers/auth");
 const { validarCampos } = require("../middlewares/validar-campos");
 const { validarJWT } = require("../middlewares/validar-jwt");
@@ -103,6 +104,9 @@ router.post(
 router.put("/editar-restaurante/:id", validarJWT, editarRestaurante);
 
 // Get para obtener los restaurantes (tiene filtros)
+router.get("/restaurantes/:nombre", getRestaurantePorNombre);
+
+// Get para obtener todos los restaurantes
 router.get("/restaurantes", getRestaurantes);
 
 // Delete para borrar restaurante
