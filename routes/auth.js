@@ -11,7 +11,8 @@ const {
   editarRestaurante,
   getRestaurantes,
   subirImagen,
-  getRestaurantePorNombre,
+  getRestaurantesPorCiudadYNombre,
+  buscarUbicacionDesdeCiudad,
 } = require("../controllers/auth");
 const { validarCampos } = require("../middlewares/validar-campos");
 const { validarJWT } = require("../middlewares/validar-jwt");
@@ -90,10 +91,11 @@ router.post(
     )
       .isArray()
       .isEmpty(),
+    check("email", "El email es obligatorio").not().isEmpty(),
+    check("email", "El email debe estar bien formado").isEmail(),
     check("ubicacion", "La ubicación no debe estar vacía").not().isEmpty(),
     check("tematica", "La tematica no debe estar vacía").not().isEmpty(),
     check("valoracion", "La valoracion no debe estar vacía").not().isEmpty(),
-    check("fotografias", "Debe haber al menos una fotografía ").not().isEmpty(),
     //Comprobamos errores en la request con el middleware
     validarCampos,
   ],
@@ -104,7 +106,10 @@ router.post(
 router.put("/editar-restaurante/:id", validarJWT, editarRestaurante);
 
 // Get para obtener los restaurantes (tiene filtros)
-router.get("/restaurantes/:nombre", getRestaurantePorNombre);
+router.get("/restaurantes/:nombre/:ciudad", getRestaurantesPorCiudadYNombre);
+
+// Get para obtener ciudad a partir de ubicacion
+router.get("/restaurantes/:ciudad", buscarUbicacionDesdeCiudad);
 
 // Get para obtener todos los restaurantes
 router.get("/restaurantes", getRestaurantes);

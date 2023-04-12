@@ -22,6 +22,8 @@ const storage = multer.diskStorage({
   },
 });
 
+//? Para obtener ciudad a partir de ubicacion
+
 const upload = multer({ storage: storage });
 exports.upload = upload.single("myFile");
 
@@ -207,16 +209,8 @@ const borrarUsuario = async (req, res = response) => {
 
 // Controlador para crear un restaurante
 const crearRestaurante = async (req, res = response) => {
-  const {
-    nombre,
-    carta,
-    horario,
-    comentarios,
-    ubicacion,
-    tematica,
-    valoracion,
-    fotografias,
-  } = req.body;
+  console.log(req.body);
+  const { nombre, ubicacion } = req.body;
 
   try {
     // Verificar ubicacion
@@ -232,6 +226,10 @@ const crearRestaurante = async (req, res = response) => {
     // Crear restaurante con el modelo
 
     const restauranteDB = new Restaurante(req.body);
+
+    // Encriptamos constraseña
+    const salt = bcrypt.genSaltSync();
+    restauranteDB.password = bcrypt.hashSync(password, salt);
 
     // Generar el JWT (Json Web Tocken)
 
@@ -333,28 +331,79 @@ const getRestaurantes = async (req, res) => {
   }
 };
 
+const buscarUbicacionDesdeCiudad = async (req, res) => {
+  const ciudad = req.params.ciudad;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${ciudad}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.length > 0) {
+    return res.status(200).json({
+      ok: true,
+      latitud: data[0].lat,
+      longitud: data[0].lon,
+      nombre: data[0].display_name,
+    });
+  } else {
+    return res.status(404).json({
+      ok: false,
+      msg: `No se ha encontrado ninguna ubicación para la ciudad de ${ciudad}`,
+    });
+  }
+};
+
+const determinarCiudadDesdeUbicacion = async (latitud, longitud) => {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitud}&lon=${longitud}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  return data.address.city;
+};
+
 // Controlador para obtener restaurantes a partir de un nombre
-const getRestaurantePorNombre = async (req, res) => {
+const getRestaurantesPorCiudadYNombre = async (req, res) => {
+  const ciudad = req.params.ciudad;
   const nombre = req.params.nombre;
+
   try {
-    const restauranteBD = await Restaurante.find({
+    const restaurantesBD = await Restaurante.find({
       nombre: { $regex: nombre, $options: "i" },
     });
-    if (!restauranteBD) {
+
+    const restaurantesFiltrados = [];
+
+    for (let i = 0; i < restaurantesBD.length; i++) {
+      const latitud = restaurantesBD[i].ubicacion[0];
+      const longitud = restaurantesBD[i].ubicacion[1];
+
+      const ciudadRestauranteBD = await determinarCiudadDesdeUbicacion(
+        latitud,
+        longitud
+      );
+
+      if (ciudadRestauranteBD.toLowerCase() === ciudad.toLowerCase()) {
+        restaurantesFiltrados.push(restaurantesBD[i]);
+      }
+    }
+
+    if (!restaurantesBD) {
       return res.status(404).json({
         ok: false,
-        msg: `No existe un restaurante con el nombre ${nombre}`,
+        msg: `No existe un restaurante con el nombre ${nombre} en la ciudad de ${ciudad}`,
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
-      restaurante: restauranteBD,
+      restaurantes: restaurantesFiltrados,
     });
   } catch (error) {
     return res.json({
       ok: false,
-      msg: `No se ha podido obtener el restaurante con nombre ${nombre}`,
+      msg: `No se ha podido obtener los restaurantes en la ciudad de ${ciudad}`,
+      error: error,
     });
   }
 };
@@ -439,5 +488,6 @@ module.exports = {
   borrarRestaurante,
   revalidarToken,
   subirImagen,
-  getRestaurantePorNombre,
+  getRestaurantesPorCiudadYNombre,
+  buscarUbicacionDesdeCiudad,
 };

@@ -2,7 +2,27 @@ const { Schema, model } = require("mongoose");
 
 //FIXME: Incluir estadisticas?
 const RestauranteSchema = Schema({
+  nombrePropietario: {
+    type: String,
+    required: true,
+  },
+  fechaNacimiento: {
+    type: String,
+    required: true,
+  },
   nombre: {
+    type: String,
+    required: true,
+  },
+  ubicacion: {
+    type: [Number],
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
     type: String,
     required: true,
   },
@@ -48,11 +68,6 @@ const RestauranteSchema = Schema({
   comentarios: {
     type: [String],
   },
-  ubicacion: {
-    type: [Number],
-    required: true,
-    unique: true,
-  },
   tematica: {
     type: String,
     required: true,
@@ -63,7 +78,7 @@ const RestauranteSchema = Schema({
   },
   fotografias: {
     type: [String],
-    required: true,
+    required: false,
   },
 });
 
