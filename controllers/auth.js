@@ -83,10 +83,12 @@ const crearUsuario = async (req, res = response) => {
 // Controlador para editar usuario
 // TODO: Controlar en el usuario si viene la fotografía o no y en caso de que no asignar fotografia estandar
 const editarUsuario = async (req, res = response) => {
+  console.log("NUEVA EDICION");
+  console.log("req", req.body);
   const _id = req.params.id;
   try {
     const usuarioDB = await Usuario.findById({ _id });
-
+    console.log("usuarioBD", usuarioDB);
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -94,12 +96,12 @@ const editarUsuario = async (req, res = response) => {
       });
     }
 
-    //? No se debe actualizar el campo google, lo sacamos de campos
-    const { google, email, ...campos } = req.body;
+    //FIXME: Se puede hacer funcion para cambiar contraseña si hacemos lo mismo que en esta funcion pero quitando la contraseña de aqui
+    const { email, password, ...campos } = req.body;
 
     if (usuarioDB.email !== email) {
       const existeEmail = await Usuario.findOne({ email });
-      if (existeEmail) {
+      if (existeEmail && usuarioDB.email != email) {
         return res.status(400).json({
           ok: false,
           msg: "Ya existe un usuario con ese email",
@@ -109,17 +111,11 @@ const editarUsuario = async (req, res = response) => {
 
     campos.email = email;
 
-    //TODO: Validar token y comprobar si es el usuario correcto
-
-    const passwordEncriptada = bcrypt.hashSync(
-      campos.password,
-      bcrypt.genSaltSync()
-    );
-    campos.password = passwordEncriptada;
     const usuarioActualizado = await Usuario.findByIdAndUpdate(_id, campos, {
       new: true,
     });
 
+    console.log("actualizado", usuarioActualizado);
     return res.status(200).json({
       ok: true,
       mag: "Usuario editado correctamente",
@@ -137,9 +133,11 @@ const editarUsuario = async (req, res = response) => {
 // Controlador de login de usuario
 const loginUsuario = async (req, res = response) => {
   const { email, password } = req.body;
+  console.log(email, password);
 
   try {
     const usuarioDB = await Usuario.findOne({ email: email });
+    console.log("usuario", usuarioDB);
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -148,8 +146,9 @@ const loginUsuario = async (req, res = response) => {
     }
 
     // Confirmar si el password hace match
+    console.log(password, usuarioDB.password);
     const passwordValida = bcrypt.compareSync(password, usuarioDB.password);
-
+    console.log(passwordValida);
     if (!passwordValida) {
       return res.status(400).json({
         ok: false,
@@ -162,12 +161,16 @@ const loginUsuario = async (req, res = response) => {
     const token = await generarJWT(usuarioDB.id, usuarioDB.nombre);
 
     // Respuesta
+    console.log(usuarioDB.listaRestaurantesFavoritos);
+    console.log(usuarioDB.reservas);
 
     return res.json({
       ok: true,
       uid: usuarioDB.id,
       nombre: usuarioDB.nombre,
       email: usuarioDB.email,
+      reservas: usuarioDB.reservas,
+      favoritos: usuarioDB.listaRestaurantesFavoritos,
       token,
     });
   } catch (error) {
@@ -205,12 +208,86 @@ const borrarUsuario = async (req, res = response) => {
   }
 };
 
+const getUsuarioPorId = async (req, res) => {
+  const _id = req.params.id;
+
+  try {
+    const usuarioBD = await Usuario.findById(_id);
+    console.log(usuarioBD);
+
+    if (usuarioBD != null) {
+      return res.status(200).json({
+        ok: true,
+        usuario: usuarioBD,
+      });
+    } else {
+      return res.status(404).json({
+        ok: false,
+        msg: `No se ha podido obtener el usuario con id ${_id}`,
+        error: error,
+      });
+    }
+  } catch (error) {
+    return res.status(404).json({
+      ok: false,
+      msg: `No se ha podido obtener el usuario con id ${_id}`,
+      error: error,
+    });
+  }
+};
+
 //? Controladores restaurante
+
+// Controlador de login de usuario
+const loginRestaurante = async (req, res = response) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+
+  try {
+    const restauranteDB = await Restaurante.findOne({ email: email });
+    console.log("restaurante", restauranteDB);
+    if (!restauranteDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: "El correo o la contraseña no son correctos",
+      });
+    }
+
+    // Confirmar si el password hace match
+    console.log(password, restauranteDB.password);
+    const passwordValida = bcrypt.compareSync(password, restauranteDB.password);
+    console.log(passwordValida);
+    if (!passwordValida) {
+      return res.status(400).json({
+        ok: false,
+        msg: "El correo o la contraseña no son correctos",
+      });
+    }
+
+    // Generar JWT
+    const token = await generarJWT(restauranteDB.id, restauranteDB.nombre);
+
+    //FIXME: Añadir datos que se requieran en la respuesta (Si es que hacen falta mas)
+    return res.json({
+      ok: true,
+      uid: restauranteDB.id,
+      nombre: restauranteDB.nombre,
+      email: restauranteDB.email,
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      msg: "Error del sistema",
+    });
+  }
+};
 
 // Controlador para crear un restaurante
 const crearRestaurante = async (req, res = response) => {
   console.log(req.body);
-  const { nombre, ubicacion } = req.body;
+  const { nombre, ubicacion, password } = req.body;
 
   try {
     // Verificar ubicacion
@@ -226,7 +303,7 @@ const crearRestaurante = async (req, res = response) => {
     // Crear restaurante con el modelo
 
     const restauranteDB = new Restaurante(req.body);
-
+    console.log(restauranteDB);
     // Encriptamos constraseña
     const salt = bcrypt.genSaltSync();
     restauranteDB.password = bcrypt.hashSync(password, salt);
@@ -269,7 +346,6 @@ const editarRestaurante = async (req, res) => {
       });
     }
 
-    //? No se debe actualizar el campo google, lo sacamos de campos
     const { ubicacion, ...campos } = req.body;
 
     if (restauranteDB.ubicacion !== ubicacion) {
@@ -277,7 +353,7 @@ const editarRestaurante = async (req, res) => {
       if (existeUbicacion) {
         return res.status(400).json({
           ok: false,
-          msg: "Ya existe un usuario con ese email",
+          msg: "Ya existe un restaurante con esa ubicacion",
         });
       }
     }
@@ -408,6 +484,35 @@ const getRestaurantesPorCiudadYNombre = async (req, res) => {
   }
 };
 
+// Controlador para obtener restaurante por id
+const getRestaurantePorId = async (req, res) => {
+  const _id = req.params.id;
+
+  try {
+    const restauranteBD = await Restaurante.findById(_id);
+    console.log(restauranteBD);
+
+    if (restauranteBD != null) {
+      return res.status(200).json({
+        ok: true,
+        restaurante: restauranteBD,
+      });
+    } else {
+      return res.status(404).json({
+        ok: false,
+        msg: `No se ha podido obtener el restaurante con id ${_id}`,
+        error: error,
+      });
+    }
+  } catch (error) {
+    return res.status(404).json({
+      ok: false,
+      msg: `No se ha podido obtener el restaurante con id ${_id}`,
+      error: error,
+    });
+  }
+};
+
 // Controlador para borrar un restaurante (borra por id)
 const borrarRestaurante = async (req, res) => {
   const _id = req.params.id;
@@ -439,13 +544,50 @@ const borrarRestaurante = async (req, res) => {
 const revalidarToken = async (req, res) => {
   const { uid, nombre } = req;
 
+  const usuarioDB = await Usuario.findById({ _id: uid });
+
   const token = await generarJWT(uid, nombre);
 
   return res.json({
     ok: true,
     uid: uid,
+    email: usuarioDB.email,
+    reservas: usuarioDB.reservas,
+    favoritos: usuarioDB.listaRestaurantesFavoritos,
     nombre: nombre,
     token: token,
+  });
+};
+
+// Controlador de renovación y validación de token
+const revalidarTokenRestaurante = async (req, res) => {
+  const { uid, nombre } = req;
+
+  const restauranteDB = await Restaurante.findById({ _id: uid });
+
+  const token = await generarJWT(uid, nombre);
+
+  return res.json({
+    ok: true,
+    uid: uid,
+    email: restauranteDB.email,
+    nombre: nombre,
+    token: token,
+  });
+};
+
+const obtenerDatosToken = async (req, res) => {
+  const { uid, nombre } = req;
+
+  const usuarioDB = await Usuario.findById({ _id: uid });
+
+  return res.json({
+    ok: true,
+    uid: uid,
+    email: usuarioDB.email,
+    reservas: usuarioDB.reservas,
+    favoritos: usuarioDB.listaRestaurantesFavoritos,
+    nombre: nombre,
   });
 };
 
@@ -490,4 +632,9 @@ module.exports = {
   subirImagen,
   getRestaurantesPorCiudadYNombre,
   buscarUbicacionDesdeCiudad,
+  obtenerDatosToken,
+  getRestaurantePorId,
+  getUsuarioPorId,
+  loginRestaurante,
+  revalidarTokenRestaurante,
 };

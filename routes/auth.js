@@ -13,6 +13,11 @@ const {
   subirImagen,
   getRestaurantesPorCiudadYNombre,
   buscarUbicacionDesdeCiudad,
+  obtenerDatosToken,
+  getRestaurantePorId,
+  getUsuarioPorId,
+  revalidarTokenRestaurante,
+  loginRestaurante,
 } = require("../controllers/auth");
 const { validarCampos } = require("../middlewares/validar-campos");
 const { validarJWT } = require("../middlewares/validar-jwt");
@@ -73,6 +78,19 @@ router.post(
   loginUsuario
 );
 
+// Login restaurante
+router.post(
+  "/login-restaurante",
+  [
+    check("email", "El email es obligatorio").not().isEmpty(),
+    check("email", "El email debe estar bien formado").isEmail(),
+    check("password", "La contraseña es obligatoria").not().isEmpty(), // isStrongPassword
+    //Comprobamos errores en la request con el middleware
+    validarCampos,
+  ],
+  loginRestaurante
+);
+
 // Borrar cuenta usuario
 router.delete("/borrar-usuario/:id", validarJWT, borrarUsuario);
 
@@ -114,6 +132,10 @@ router.get("/restaurantes/:ciudad", buscarUbicacionDesdeCiudad);
 // Get para obtener todos los restaurantes
 router.get("/restaurantes", getRestaurantes);
 
+router.get("/restaurante/:id", getRestaurantePorId);
+
+router.get("/usuario/:id", getUsuarioPorId);
+
 // Delete para borrar restaurante
 router.delete("/borrar-restaurante/:id", validarJWT, borrarRestaurante);
 
@@ -121,6 +143,12 @@ router.delete("/borrar-restaurante/:id", validarJWT, borrarRestaurante);
 
 // Validar y renovar token
 router.get("/auth/renovar", validarJWT, revalidarToken);
+
+// Validar token restaurante
+router.get("/auth/renovar-restaurante", validarJWT, revalidarTokenRestaurante);
+
+// Obtener datos a partir del token
+router.get("/auth/obtener-datos", validarJWT, obtenerDatosToken);
 
 // Subir imagen
 router.post("/subir-imagen", [], subirImagen);

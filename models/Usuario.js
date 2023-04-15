@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const Restaurante = require("../models/Restaurante");
 
 const UsuarioSchema = Schema({
   nombre: {
@@ -34,9 +33,9 @@ const UsuarioSchema = Schema({
     type: String,
     required: true,
   },
-  google: {
-    type: Boolean,
-    default: false,
+  reservas: {
+    type: [String],
+    required: true,
   },
 });
 

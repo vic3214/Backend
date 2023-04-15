@@ -62,7 +62,12 @@ const RestauranteSchema = Schema({
     required: true,
   },
   horario: {
-    type: String,
+    type: [
+      {
+        dias: [String],
+        horas: [String],
+      },
+    ],
     required: true,
   },
   comentarios: {
