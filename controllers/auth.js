@@ -31,8 +31,6 @@ exports.upload = upload.single("myFile");
 
 // Controlador de alta de nuevo usuario
 const crearUsuario = async (req, res = response) => {
-  console.log("Creando usuario con req:");
-  console.log(req.body);
   const { nombre, email, password } = req.body;
 
   try {
@@ -73,7 +71,6 @@ const crearUsuario = async (req, res = response) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -83,12 +80,9 @@ const crearUsuario = async (req, res = response) => {
 // Controlador para editar usuario
 // TODO: Controlar en el usuario si viene la fotografía o no y en caso de que no asignar fotografia estandar
 const editarUsuario = async (req, res = response) => {
-  console.log("NUEVA EDICION");
-  console.log("req", req.body);
   const _id = req.params.id;
   try {
     const usuarioDB = await Usuario.findById({ _id });
-    console.log("usuarioBD", usuarioDB);
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -115,14 +109,12 @@ const editarUsuario = async (req, res = response) => {
       new: true,
     });
 
-    console.log("actualizado", usuarioActualizado);
     return res.status(200).json({
       ok: true,
       mag: "Usuario editado correctamente",
       usuario: usuarioActualizado,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       mag: "Error del sistema",
@@ -133,11 +125,10 @@ const editarUsuario = async (req, res = response) => {
 // Controlador de login de usuario
 const loginUsuario = async (req, res = response) => {
   const { email, password } = req.body;
-  console.log(email, password);
 
   try {
     const usuarioDB = await Usuario.findOne({ email: email });
-    console.log("usuario", usuarioDB);
+
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -146,9 +137,9 @@ const loginUsuario = async (req, res = response) => {
     }
 
     // Confirmar si el password hace match
-    console.log(password, usuarioDB.password);
+
     const passwordValida = bcrypt.compareSync(password, usuarioDB.password);
-    console.log(passwordValida);
+
     if (!passwordValida) {
       return res.status(400).json({
         ok: false,
@@ -160,10 +151,6 @@ const loginUsuario = async (req, res = response) => {
 
     const token = await generarJWT(usuarioDB.id, usuarioDB.nombre);
 
-    // Respuesta
-    console.log(usuarioDB.listaRestaurantesFavoritos);
-    console.log(usuarioDB.reservas);
-
     return res.json({
       ok: true,
       uid: usuarioDB.id,
@@ -174,7 +161,6 @@ const loginUsuario = async (req, res = response) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -213,7 +199,6 @@ const getUsuarioPorId = async (req, res) => {
 
   try {
     const usuarioBD = await Usuario.findById(_id);
-    console.log(usuarioBD);
 
     if (usuarioBD != null) {
       return res.status(200).json({
@@ -241,11 +226,10 @@ const getUsuarioPorId = async (req, res) => {
 // Controlador de login de usuario
 const loginRestaurante = async (req, res = response) => {
   const { email, password } = req.body;
-  console.log(email, password);
 
   try {
     const restauranteDB = await Restaurante.findOne({ email: email });
-    console.log("restaurante", restauranteDB);
+
     if (!restauranteDB) {
       return res.status(404).json({
         ok: false,
@@ -254,9 +238,8 @@ const loginRestaurante = async (req, res = response) => {
     }
 
     // Confirmar si el password hace match
-    console.log(password, restauranteDB.password);
     const passwordValida = bcrypt.compareSync(password, restauranteDB.password);
-    console.log(passwordValida);
+
     if (!passwordValida) {
       return res.status(400).json({
         ok: false,
@@ -276,7 +259,6 @@ const loginRestaurante = async (req, res = response) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -286,7 +268,6 @@ const loginRestaurante = async (req, res = response) => {
 
 // Controlador para crear un restaurante
 const crearRestaurante = async (req, res = response) => {
-  console.log(req.body);
   const { nombre, ubicacion, password } = req.body;
 
   try {
@@ -303,7 +284,6 @@ const crearRestaurante = async (req, res = response) => {
     // Crear restaurante con el modelo
 
     const restauranteDB = new Restaurante(req.body);
-    console.log(restauranteDB);
     // Encriptamos constraseña
     const salt = bcrypt.genSaltSync();
     restauranteDB.password = bcrypt.hashSync(password, salt);
@@ -325,7 +305,6 @@ const crearRestaurante = async (req, res = response) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -376,7 +355,6 @@ const editarRestaurante = async (req, res) => {
       restaurante: restauranteActualizado,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       ok: false,
       mag: "Error del sistema",
@@ -490,7 +468,6 @@ const getRestaurantePorId = async (req, res) => {
 
   try {
     const restauranteBD = await Restaurante.findById(_id);
-    console.log(restauranteBD);
 
     if (restauranteBD != null) {
       return res.status(200).json({
