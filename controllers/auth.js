@@ -314,6 +314,7 @@ const crearRestaurante = async (req, res = response) => {
 
 // Controlador para editar un restaurante
 const editarRestaurante = async (req, res) => {
+  console.log("bodyeditar", req.body);
   const _id = req.params.id;
   try {
     const restauranteDB = await Restaurante.findById({ _id });
@@ -325,9 +326,9 @@ const editarRestaurante = async (req, res) => {
       });
     }
 
-    const { ubicacion, ...campos } = req.body;
+    const { ubicacion, password, ...campos } = req.body;
 
-    if (restauranteDB.ubicacion !== ubicacion) {
+    if (restauranteDB.ubicacion.join() !== ubicacion.join()) {
       const existeUbicacion = await Restaurante.findOne({ ubicacion });
       if (existeUbicacion) {
         return res.status(400).json({
@@ -337,7 +338,7 @@ const editarRestaurante = async (req, res) => {
       }
     }
 
-    campos.ubicacion = ubicacion;
+    // campos.ubicacion = ubicacion;
 
     //TODO: Validar token y comprobar si es el restaurante correcto
 

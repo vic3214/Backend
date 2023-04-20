@@ -74,13 +74,19 @@ const RestauranteSchema = Schema({
     type: [
       {
         usuario: String,
+        personas: Number,
         horario: String,
       },
     ],
     required: true,
   },
   comentarios: {
-    type: [String],
+    type: [
+      {
+        usuario: String,
+        comentario: String,
+      },
+    ],
   },
   tematica: {
     type: String,
