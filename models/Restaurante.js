@@ -75,7 +75,8 @@ const RestauranteSchema = Schema({
       {
         usuario: String,
         personas: Number,
-        horario: String,
+        hora: String,
+        fecha: Date,
       },
     ],
     required: true,
