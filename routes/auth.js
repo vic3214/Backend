@@ -113,7 +113,6 @@ router.post(
     check("email", "El email debe estar bien formado").isEmail(),
     check("ubicacion", "La ubicación no debe estar vacía").not().isEmpty(),
     check("tematica", "La tematica no debe estar vacía").not().isEmpty(),
-    check("valoracion", "La valoracion no debe estar vacía").not().isEmpty(),
     //Comprobamos errores en la request con el middleware
     validarCampos,
   ],

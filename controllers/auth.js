@@ -158,6 +158,8 @@ const loginUsuario = async (req, res = response) => {
       email: usuarioDB.email,
       reservas: usuarioDB.reservas,
       favoritos: usuarioDB.listaRestaurantesFavoritos,
+      fechaNacimiento: usuarioDB.fechaNacimiento,
+      opiniones: usuarioDB.listaOpiniones,
       token,
     });
   } catch (error) {

@@ -94,7 +94,12 @@ const RestauranteSchema = Schema({
     required: true,
   },
   valoracion: {
-    type: Number,
+    type: [
+      {
+        usuario: String,
+        voto: Number,
+      },
+    ],
     required: true,
   },
   fotografias: {
