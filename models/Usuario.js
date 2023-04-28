@@ -34,7 +34,16 @@ const UsuarioSchema = Schema({
     required: true,
   },
   reservas: {
-    type: [String],
+    type: [
+      {
+        uidReserva: String,
+        uidRestaurante: String,
+        usuario: String,
+        personas: Number,
+        hora: String,
+        fecha: Date,
+      },
+    ],
     required: true,
   },
 });

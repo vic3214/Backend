@@ -16,6 +16,7 @@ const {
   obtenerDatosToken,
   getRestaurantePorId,
   getUsuarioPorId,
+  obtenerDatosTokenRestaurante,
   revalidarTokenRestaurante,
   loginRestaurante,
 } = require("../controllers/auth");
@@ -148,6 +149,12 @@ router.get("/auth/renovar-restaurante", validarJWT, revalidarTokenRestaurante);
 
 // Obtener datos a partir del token
 router.get("/auth/obtener-datos", validarJWT, obtenerDatosToken);
+
+router.get(
+  "/auth/obtener-datos-restaurante",
+  validarJWT,
+  obtenerDatosTokenRestaurante
+);
 
 // Subir imagen
 router.post("/subir-imagen", [], subirImagen);

@@ -80,9 +80,11 @@ const crearUsuario = async (req, res = response) => {
 // Controlador para editar usuario
 // TODO: Controlar en el usuario si viene la fotografía o no y en caso de que no asignar fotografia estandar
 const editarUsuario = async (req, res = response) => {
+  console.log(req.body);
   const _id = req.params.id;
   try {
     const usuarioDB = await Usuario.findById({ _id });
+    console.log("Usuario", usuarioDB);
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -104,11 +106,12 @@ const editarUsuario = async (req, res = response) => {
     }
 
     campos.email = email;
-
+    console.log("_id", _id);
+    console.log("campos", campos);
     const usuarioActualizado = await Usuario.findByIdAndUpdate(_id, campos, {
       new: true,
     });
-
+    console.log("Usuario actu", usuarioActualizado);
     return res.status(200).json({
       ok: true,
       mag: "Usuario editado correctamente",
@@ -316,7 +319,6 @@ const crearRestaurante = async (req, res = response) => {
 
 // Controlador para editar un restaurante
 const editarRestaurante = async (req, res) => {
-  console.log("bodyeditar", req.body);
   const _id = req.params.id;
   try {
     const restauranteDB = await Restaurante.findById({ _id });
@@ -556,6 +558,17 @@ const revalidarTokenRestaurante = async (req, res) => {
   });
 };
 
+const obtenerDatosTokenRestaurante = async (req, res) => {
+  const uid = req.uid;
+
+  const restauranteDB = await Restaurante.findById({ _id: uid });
+
+  return res.json({
+    ok: true,
+    restaurante: restauranteDB,
+  });
+};
+
 const obtenerDatosToken = async (req, res) => {
   const { uid, nombre } = req;
 
@@ -616,5 +629,6 @@ module.exports = {
   getRestaurantePorId,
   getUsuarioPorId,
   loginRestaurante,
+  obtenerDatosTokenRestaurante,
   revalidarTokenRestaurante,
 };
