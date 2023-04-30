@@ -32,30 +32,35 @@ const RestauranteSchema = Schema({
         {
           nombrePlato: String,
           precio: Number,
+          tipo: String,
         },
       ],
       primerosPlatos: [
         {
           nombrePlato: String,
           precio: Number,
+          tipo: String,
         },
       ],
       segundosPlatos: [
         {
           nombrePlato: String,
           precio: Number,
+          tipo: String,
         },
       ],
       postres: [
         {
           nombrePlato: String,
           precio: Number,
+          tipo: String,
         },
       ],
       bebidas: [
         {
           nombrePlato: String,
           precio: Number,
+          tipo: String,
         },
       ],
     },
