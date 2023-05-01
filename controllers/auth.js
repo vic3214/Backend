@@ -80,11 +80,9 @@ const crearUsuario = async (req, res = response) => {
 // Controlador para editar usuario
 // TODO: Controlar en el usuario si viene la fotografía o no y en caso de que no asignar fotografia estandar
 const editarUsuario = async (req, res = response) => {
-  console.log(req.body);
   const _id = req.params.id;
   try {
     const usuarioDB = await Usuario.findById({ _id });
-    console.log("Usuario", usuarioDB);
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
@@ -106,21 +104,18 @@ const editarUsuario = async (req, res = response) => {
     }
 
     campos.email = email;
-    console.log("_id", _id);
-    console.log("campos", campos);
     const usuarioActualizado = await Usuario.findByIdAndUpdate(_id, campos, {
       new: true,
     });
-    console.log("Usuario actu", usuarioActualizado);
     return res.status(200).json({
       ok: true,
-      mag: "Usuario editado correctamente",
+      msg: "Usuario editado correctamente",
       usuario: usuarioActualizado,
     });
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      mag: "Error del sistema",
+      msg: "Error del sistema",
     });
   }
 };
@@ -356,13 +351,51 @@ const editarRestaurante = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      mag: "Restaurante editado correctamente",
+      msg: "Restaurante editado correctamente",
       restaurante: restauranteActualizado,
     });
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      mag: "Error del sistema",
+      msg: "Error del sistema",
+    });
+  }
+};
+
+const editarPasswordRestaurante = async (req, res) => {
+  const _id = req.params.id;
+  try {
+    const restauranteDB = await Restaurante.findById({ _id });
+
+    if (!restauranteDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: `No se ha encontrado un restaurante con el id ${_id}`,
+      });
+    }
+
+    const { ubicacion, password, ...campos } = req.body;
+
+    const salt = bcrypt.genSaltSync();
+    campos.password = bcrypt.hashSync(password, salt);
+
+    const restauranteActualizado = await Restaurante.findByIdAndUpdate(
+      _id,
+      campos,
+      {
+        new: true,
+      }
+    );
+
+    return res.status(200).json({
+      ok: true,
+      msg: "Restaurante editado correctamente",
+      restaurante: restauranteActualizado,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      msg: "Error del sistema",
     });
   }
 };
@@ -392,7 +425,7 @@ const getRestaurantes = async (req, res) => {
 
 const buscarUbicacionDesdeCiudad = async (req, res) => {
   const ciudad = req.params.ciudad;
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${ciudad}`;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${ciudad}&countrycodes=es`;
 
   const response = await fetch(url);
   const data = await response.json();
@@ -631,4 +664,5 @@ module.exports = {
   loginRestaurante,
   obtenerDatosTokenRestaurante,
   revalidarTokenRestaurante,
+  editarPasswordRestaurante,
 };

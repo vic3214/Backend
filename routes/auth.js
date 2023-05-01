@@ -19,6 +19,7 @@ const {
   obtenerDatosTokenRestaurante,
   revalidarTokenRestaurante,
   loginRestaurante,
+  editarPasswordRestaurante,
 } = require("../controllers/auth");
 const { validarCampos } = require("../middlewares/validar-campos");
 const { validarJWT } = require("../middlewares/validar-jwt");
@@ -122,6 +123,12 @@ router.post(
 
 // Put para editar restaurante
 router.put("/editar-restaurante/:id", validarJWT, editarRestaurante);
+
+router.put(
+  "/editar-password-restaurante/:id",
+  validarJWT,
+  editarPasswordRestaurante
+);
 
 // Get para obtener los restaurantes (tiene filtros)
 router.get("/restaurantes/:nombre/:ciudad", getRestaurantesPorCiudadYNombre);

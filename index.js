@@ -7,8 +7,6 @@ const bodyParser = require("body-parser");
 
 // Importamos cors
 const cors = require("cors");
-// Importamos fileUpload para poder subir archivos
-const fileUpload = require("express-fileupload");
 // Importamos variable de entorno desde dotenv
 require("dotenv").config();
 
