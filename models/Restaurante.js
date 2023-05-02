@@ -107,8 +107,8 @@ const RestauranteSchema = Schema({
     ],
     required: true,
   },
-  fotografias: {
-    type: [String],
+  fotografia: {
+    type: String,
     required: false,
   },
 });

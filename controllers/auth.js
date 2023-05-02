@@ -11,6 +11,7 @@ const { generarJWT } = require("../helpers/jwt");
 const { db } = require("../models/Restaurante");
 const { default: mongoose } = require("mongoose");
 const MongoClient = require("mongodb").MongoClient;
+const { ObjectId } = require("mongodb");
 const multer = require("multer");
 //Configuracion multer
 const storage = multer.diskStorage({
@@ -645,7 +646,32 @@ const subirImagen = async (req, res) => {
   });
 };
 
+const recuperarImagen = async (req, res) => {
+  const _id = req.params.id;
+  const client = new MongoClient(
+    "mongodb+srv://VictorCaballeroTFG:baseDeDatos112@basededatostfg.gjhvq.mongodb.net/basededatos",
+    {
+      useNewUrlParser: true,
+    }
+  );
+  await client.connect();
+
+  const db = client.db("basededatos");
+  const coleccion = db.collection("Imagenes");
+  console.log(_id);
+  const imagen = await coleccion.findOne({ _id: new ObjectId(_id) });
+  console.log(imagen);
+  if (!imagen) {
+    res.status(404).send("Imagen no encontrada");
+  } else {
+    const imagen_base64 = imagen.imagen.toString("base64");
+    res.json({ imagen: imagen_base64 });
+  }
+  client.close();
+};
+
 module.exports = {
+  recuperarImagen,
   crearUsuario,
   editarUsuario,
   loginUsuario,

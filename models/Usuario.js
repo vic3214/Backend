@@ -19,7 +19,6 @@ const UsuarioSchema = Schema({
     required: true,
   },
   fotografia: {
-    // Cadena con el id de la fotografia
     type: String,
   },
   listaOpiniones: {

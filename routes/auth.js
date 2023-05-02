@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 const {
+  recuperarImagen,
   crearUsuario,
   revalidarToken,
   loginUsuario,
@@ -165,6 +166,9 @@ router.get(
 
 // Subir imagen
 router.post("/subir-imagen", [], subirImagen);
+
+// Recuperar imagen
+router.get("/recuperar-imagen/:id", recuperarImagen);
 
 // Exportamos el módulo
 module.exports = router;
