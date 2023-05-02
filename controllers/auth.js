@@ -658,9 +658,8 @@ const recuperarImagen = async (req, res) => {
 
   const db = client.db("basededatos");
   const coleccion = db.collection("Imagenes");
-  console.log(_id);
   const imagen = await coleccion.findOne({ _id: new ObjectId(_id) });
-  console.log(imagen);
+
   if (!imagen) {
     res.status(404).send("Imagen no encontrada");
   } else {
