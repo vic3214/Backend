@@ -326,7 +326,7 @@ const editarRestaurante = async (req, res) => {
       });
     }
 
-    const { ubicacion, password, ...campos } = req.body;
+    const { ubicacion, password, fotografia, ...campos } = req.body;
 
     if (restauranteDB.ubicacion.join() !== ubicacion.join()) {
       const existeUbicacion = await Restaurante.findOne({ ubicacion });

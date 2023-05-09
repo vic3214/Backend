@@ -123,7 +123,7 @@ router.post(
 );
 
 // Put para editar restaurante
-router.put("/editar-restaurante/:id", validarJWT, editarRestaurante);
+router.put("/editar-restaurante/:id", editarRestaurante);
 
 router.put(
   "/editar-password-restaurante/:id",
