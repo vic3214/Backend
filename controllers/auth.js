@@ -459,7 +459,8 @@ const determinarCiudadDesdeUbicacion = async (latitud, longitud) => {
 const getRestaurantesPorCiudadYNombre = async (req, res) => {
   const ciudad = req.params.ciudad;
   const nombre = req.params.nombre;
-
+  console.log(ciudad);
+  console.log(nombre);
   try {
     const restaurantesBD = await Restaurante.find({
       nombre: { $regex: nombre, $options: "i" },
@@ -475,8 +476,12 @@ const getRestaurantesPorCiudadYNombre = async (req, res) => {
         latitud,
         longitud
       );
-
-      if (ciudadRestauranteBD.toLowerCase() === ciudad.toLowerCase()) {
+      console.log(ciudadRestauranteBD);
+      console.log(ciudad.includes(ciudadRestauranteBD));
+      if (
+        ciudadRestauranteBD.toLowerCase() === ciudad.toLowerCase() ||
+        ciudad.includes(ciudadRestauranteBD)
+      ) {
         restaurantesFiltrados.push(restaurantesBD[i]);
       }
     }
