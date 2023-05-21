@@ -83,10 +83,12 @@ const RestauranteSchema = Schema({
   reservas: {
     type: [
       {
+        uidUsuario: String,
         usuario: String,
         personas: Number,
         hora: String,
         fecha: Date,
+        estado: Boolean,
       },
     ],
     required: true,

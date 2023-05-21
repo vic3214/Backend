@@ -37,10 +37,12 @@ const UsuarioSchema = Schema({
       {
         uidReserva: String,
         uidRestaurante: String,
+        uidUsuario: String,
         usuario: String,
         personas: Number,
         hora: String,
         fecha: Date,
+        estado: Boolean,
       },
     ],
     required: true,
