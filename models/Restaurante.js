@@ -84,6 +84,7 @@ const RestauranteSchema = Schema({
     type: [
       {
         uidUsuario: String,
+        uidReserva: String,
         usuario: String,
         personas: Number,
         hora: String,
