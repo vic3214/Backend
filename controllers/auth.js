@@ -653,6 +653,7 @@ const subirImagen = async (req, res) => {
 
 const recuperarImagen = async (req, res) => {
   const _id = req.params.id;
+  console.log(req.params.id);
   const client = new MongoClient(
     "mongodb+srv://VictorCaballeroTFG:baseDeDatos112@basededatostfg.gjhvq.mongodb.net/basededatos",
     {
@@ -664,7 +665,12 @@ const recuperarImagen = async (req, res) => {
   const db = client.db("basededatos");
   const coleccion = db.collection("Imagenes");
   console.log(_id);
-  const imagen = await coleccion.findOne({ _id: new ObjectId(_id) });
+  let imagen;
+  if (_id !== null && _id !== undefined && _id !== "null") {
+    imagen = await coleccion.findOne({ _id: new ObjectId(_id) });
+  } else {
+    imagen = undefined;
+  }
 
   if (!imagen) {
     res.status(404).send("Imagen no encontrada");
