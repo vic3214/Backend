@@ -459,8 +459,7 @@ const determinarCiudadDesdeUbicacion = async (latitud, longitud) => {
 const getRestaurantesPorCiudadYNombre = async (req, res) => {
   const ciudad = req.params.ciudad;
   const nombre = req.params.nombre;
-  console.log(ciudad);
-  console.log(nombre);
+
   try {
     const restaurantesBD = await Restaurante.find({
       nombre: { $regex: nombre, $options: "i" },
@@ -476,8 +475,6 @@ const getRestaurantesPorCiudadYNombre = async (req, res) => {
         latitud,
         longitud
       );
-      console.log(ciudadRestauranteBD);
-      console.log(ciudad.includes(ciudadRestauranteBD));
       if (
         ciudadRestauranteBD.toLowerCase() === ciudad.toLowerCase() ||
         ciudad.includes(ciudadRestauranteBD)
@@ -653,7 +650,6 @@ const subirImagen = async (req, res) => {
 
 const recuperarImagen = async (req, res) => {
   const _id = req.params.id;
-  console.log(req.params.id);
   const client = new MongoClient(
     "mongodb+srv://VictorCaballeroTFG:baseDeDatos112@basededatostfg.gjhvq.mongodb.net/basededatos",
     {
@@ -664,7 +660,7 @@ const recuperarImagen = async (req, res) => {
 
   const db = client.db("basededatos");
   const coleccion = db.collection("Imagenes");
-  console.log(_id);
+
   let imagen;
   if (_id !== null && _id !== undefined && _id !== "null") {
     imagen = await coleccion.findOne({ _id: new ObjectId(_id) });
