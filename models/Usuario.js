@@ -22,13 +22,10 @@ const UsuarioSchema = Schema({
     type: String,
   },
   listaOpiniones: {
-    //FIXME: Incluir valoraciones?
     type: [String],
     required: true,
   },
   fechaNacimiento: {
-    //? Formato de fecha 'año-mes-dia' EJ: '1999-04-11'
-    // FIXME: Asignar formato de fecha correctamente en calendario y asignar tipo Date
     type: String,
     required: true,
   },

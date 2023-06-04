@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 
-//FIXME: Incluir estadisticas?
 const RestauranteSchema = Schema({
   nombrePropietario: {
     type: String,

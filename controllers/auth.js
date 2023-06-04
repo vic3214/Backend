@@ -79,7 +79,6 @@ const crearUsuario = async (req, res = response) => {
   }
 };
 // Controlador para editar usuario
-// TODO: Controlar en el usuario si viene la fotografía o no y en caso de que no asignar fotografia estandar
 const editarUsuario = async (req, res = response) => {
   const _id = req.params.id;
   try {
@@ -91,7 +90,6 @@ const editarUsuario = async (req, res = response) => {
       });
     }
 
-    //FIXME: Se puede hacer funcion para cambiar contraseña si hacemos lo mismo que en esta funcion pero quitando la contraseña de aqui
     const { email, password, ...campos } = req.body;
 
     if (usuarioDB.email !== email) {
@@ -251,7 +249,6 @@ const loginRestaurante = async (req, res = response) => {
     // Generar JWT
     const token = await generarJWT(restauranteDB.id, restauranteDB.nombre);
 
-    //FIXME: Añadir datos que se requieran en la respuesta (Si es que hacen falta mas)
     return res.json({
       ok: true,
       uid: restauranteDB.id,
@@ -337,10 +334,6 @@ const editarRestaurante = async (req, res) => {
         });
       }
     }
-
-    // campos.ubicacion = ubicacion;
-
-    //TODO: Validar token y comprobar si es el restaurante correcto
 
     const restauranteActualizado = await Restaurante.findByIdAndUpdate(
       _id,
@@ -451,8 +444,12 @@ const determinarCiudadDesdeUbicacion = async (latitud, longitud) => {
 
   const response = await fetch(url);
   const data = await response.json();
-
-  return data.address.city;
+  console.log(data);
+  if (data.address.city) {
+    return data.address.city;
+  } else {
+    return data.address.village;
+  }
 };
 
 // Controlador para obtener restaurantes a partir de un nombre
@@ -461,9 +458,14 @@ const getRestaurantesPorCiudadYNombre = async (req, res) => {
   const nombre = req.params.nombre;
 
   try {
-    const restaurantesBD = await Restaurante.find({
-      nombre: { $regex: nombre, $options: "i" },
-    });
+    let restaurantesBD;
+    if (nombre === "Buscar todos") {
+      restaurantesBD = await Restaurante.find();
+    } else {
+      restaurantesBD = await Restaurante.find({
+        nombre: { $regex: nombre, $options: "i" },
+      });
+    }
 
     const restaurantesFiltrados = [];
 
@@ -475,6 +477,7 @@ const getRestaurantesPorCiudadYNombre = async (req, res) => {
         latitud,
         longitud
       );
+
       if (
         ciudadRestauranteBD.toLowerCase() === ciudad.toLowerCase() ||
         ciudad.includes(ciudadRestauranteBD)
