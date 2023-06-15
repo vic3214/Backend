@@ -89,9 +89,7 @@ const editarUsuario = async (req, res = response) => {
         msg: `No se ha encontrado un usuario con el id ${_id}`,
       });
     }
-
     const { email, password, ...campos } = req.body;
-
     if (usuarioDB.email !== email) {
       const existeEmail = await Usuario.findOne({ email });
       if (existeEmail && usuarioDB.email != email) {
@@ -101,7 +99,6 @@ const editarUsuario = async (req, res = response) => {
         });
       }
     }
-
     campos.email = email;
     const usuarioActualizado = await Usuario.findByIdAndUpdate(_id, campos, {
       new: true,
@@ -132,9 +129,7 @@ const loginUsuario = async (req, res = response) => {
         msg: "El correo o la contraseña no son correctos",
       });
     }
-
     // Confirmar si el password hace match
-
     const passwordValida = bcrypt.compareSync(password, usuarioDB.password);
 
     if (!passwordValida) {
@@ -143,9 +138,7 @@ const loginUsuario = async (req, res = response) => {
         msg: "El correo o la contraseña no son correctos",
       });
     }
-
     // Generar JWT
-
     const token = await generarJWT(usuarioDB.id, usuarioDB.nombre);
 
     return res.json({
