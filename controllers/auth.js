@@ -100,15 +100,112 @@ const editarUsuario = async (req, res = response) => {
       }
     }
     campos.email = email;
+
     const usuarioActualizado = await Usuario.findByIdAndUpdate(_id, campos, {
-      new: true,
+      new: false,
     });
+
+    // Enviar correo si se elimina una reserva a un usuario
+    if (req.body.reservas) {
+      const reservasAntiguas = usuarioDB.reservas;
+      const reservasNuevas = campos.reservas;
+
+      //Convierte la fecha de reservas antiguas a cadena
+      for (let i = 0; i < reservasAntiguas.length; i++) {
+        reservasAntiguas[i].fecha = reservasAntiguas[i].fecha.toString();
+      }
+
+      console.log("reservasAntiguas", reservasAntiguas);
+      console.log("reservasNuevas", reservasNuevas);
+
+      for (let i = 0; i < reservasAntiguas.length; i++) {
+        if (
+          !reservasNuevas.some(
+            (reservaNueva) =>
+              reservaNueva.uidReserva === reservasAntiguas[i].uidReserva
+          ) &&
+          reservasAntiguas.length > reservasNuevas.length
+        ) {
+          const restauranteDB = await Restaurante.findById(
+            reservasAntiguas[i].uidRestaurante
+          );
+          const email = "victorhornachos@gmail.com"; //usuarioActualizado.email;
+          const nombre = usuarioActualizado.nombre;
+          const restaurante = restauranteDB.nombre;
+          const fecha = usuarioActualizado.reservas[i].fecha;
+
+          const dia = fecha.getDate();
+
+          const mes = fecha.getMonth() + 1;
+
+          const mesEspanol =
+            mes === 1
+              ? "Enero"
+              : mes === 2
+              ? "Febrero"
+              : mes === 3
+              ? "Marzo"
+              : mes === 4
+              ? "Abril"
+              : mes === 5
+              ? "Mayo"
+              : mes === 6
+              ? "Junio"
+              : mes === 7
+              ? "Julio"
+              : mes === 8
+              ? "Agosto"
+              : mes === 9
+              ? "Septiembre"
+              : mes === 10
+              ? "Octubre"
+              : mes === 11
+              ? "Noviembre"
+              : "Diciembre";
+
+          console.log(restauranteDB.reservas[i]);
+          const hora = restauranteDB.reservas[i].hora;
+          const asunto = "Reserva cancelada";
+          const mensaje = `Hola ${nombre}, lamentamos informarte de que tu reserva en el restaurante ${restaurante} para el día ${dia} de ${mesEspanol} a las ${hora} ha sido cancelada. Sentimos las molestias.`;
+
+          const nodemailer = require("nodemailer");
+
+          let transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: "lacucharapruebaservices@gmail.com",
+              pass: "nmnx mfoh psmd jyhc",
+            },
+          });
+          //lacucharapruebaservices11
+
+          let mailOptions = {
+            from: '"La cuchara 🥄 " <lacucharapruebaservices@gmail.com>',
+            to: email,
+            subject: asunto,
+            text: mensaje,
+          };
+
+          console.log("Enviando...");
+
+          transporter.sendMail(mailOptions, (err, data) => {
+            if (err) {
+              console.log("Error occurs", err);
+            } else {
+              console.log("Email sent!!!");
+            }
+          });
+        }
+      }
+    }
+
     return res.status(200).json({
       ok: true,
       msg: "Usuario editado correctamente",
       usuario: usuarioActualizado,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -342,6 +439,7 @@ const editarRestaurante = async (req, res) => {
       restaurante: restauranteActualizado,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       ok: false,
       msg: "Error del sistema",
@@ -437,7 +535,6 @@ const determinarCiudadDesdeUbicacion = async (latitud, longitud) => {
 
   const response = await fetch(url);
   const data = await response.json();
-  console.log(data);
   if (data.address.city) {
     return data.address.city;
   } else {
@@ -539,6 +636,75 @@ const borrarRestaurante = async (req, res) => {
       });
     }
 
+    //Mandar correo a todos los usuarios que tienen reservas en el restaurante
+    const reservas = restauranteBD.reservas;
+    for (let i = 0; i < reservas.length; i++) {
+      const usuarioDB = await Usuario.findById(reservas[i].uidUsuario);
+      const email = usuarioDB.email;
+      const nombre = usuarioDB.nombre;
+      const restaurante = restauranteBD.nombre;
+      const fecha = usuarioDB.reservas[i].fecha;
+
+      const dia = fecha.getDate();
+
+      const mes = fecha.getMonth() + 1;
+
+      const mesEspanol =
+        mes === 1
+          ? "Enero"
+          : mes === 2
+          ? "Febrero"
+          : mes === 3
+          ? "Marzo"
+          : mes === 4
+          ? "Abril"
+          : mes === 5
+          ? "Mayo"
+          : mes === 6
+          ? "Junio"
+          : mes === 7
+          ? "Julio"
+          : mes === 8
+          ? "Agosto"
+          : mes === 9
+          ? "Septiembre"
+          : mes === 10
+          ? "Octubre"
+          : mes === 11
+          ? "Noviembre"
+          : "Diciembre";
+
+      const hora = restauranteBD.reservas[i].hora;
+      const asunto = "Restaurante eliminado";
+      const mensaje = `Hola ${nombre}, lamentamos informarte de que el restaurante ${restaurante} en el que tenías una reserva para el día ${dia} de ${mesEspanol} a las ${hora} ha sido eliminado de nuestra aplicación por lo que sus reservas han sido canceladas automáticamente. Sentimos las molestias.`;
+
+      const nodemailer = require("nodemailer");
+
+      let transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "lacucharapruebaservices@gmail.com",
+          pass: "nmnx mfoh psmd jyhc",
+        },
+      });
+
+      let mailOptions = {
+        from: '"La cuchara 🥄 " <lacucharapruebaservices@gmail.com>',
+        to: "victorhornachos@gmail.com", //email,
+        subject: asunto,
+        text: mensaje,
+      };
+
+      console.log("Enviando...");
+
+      transporter.sendMail(mailOptions, (err, data) => {
+        if (err) {
+          console.log("Error occurs", err);
+        } else {
+          console.log("Email sent!!!");
+        }
+      });
+    }
     await Restaurante.findByIdAndDelete(_id);
 
     res.status(200).json({

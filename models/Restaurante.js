@@ -33,6 +33,8 @@ const RestauranteSchema = Schema({
           precio: Number,
           tipo: String,
           fotografiaPlato: String,
+          alergenos: [String],
+          descripcion: String,
         },
       ],
       primerosPlatos: [
@@ -41,6 +43,8 @@ const RestauranteSchema = Schema({
           precio: Number,
           tipo: String,
           fotografiaPlato: String,
+          alergenos: [String],
+          descripcion: String,
         },
       ],
       segundosPlatos: [
@@ -49,6 +53,8 @@ const RestauranteSchema = Schema({
           precio: Number,
           tipo: String,
           fotografiaPlato: String,
+          alergenos: [String],
+          descripcion: String,
         },
       ],
       postres: [
@@ -57,6 +63,8 @@ const RestauranteSchema = Schema({
           precio: Number,
           tipo: String,
           fotografiaPlato: String,
+          alergenos: [String],
+          descripcion: String,
         },
       ],
       bebidas: [
@@ -65,6 +73,8 @@ const RestauranteSchema = Schema({
           precio: Number,
           tipo: String,
           fotografiaPlato: String,
+          alergenos: [String],
+          descripcion: String,
         },
       ],
     },
@@ -84,11 +94,11 @@ const RestauranteSchema = Schema({
       {
         uidUsuario: String,
         uidReserva: String,
+        uidRestaurante: String,
         usuario: String,
         personas: Number,
         hora: String,
         fecha: Date,
-        estado: Boolean,
       },
     ],
     required: true,

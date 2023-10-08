@@ -32,7 +32,6 @@ const router = Router();
 router.put(
   "/editar-usuario/:id",
   [
-    validarJWT,
     check("nombre", "El nombre no debe estar vacío").not().isEmpty(),
     check(
       "email",
