@@ -129,7 +129,7 @@ const editarUsuario = async (req, res = response) => {
           const restauranteDB = await Restaurante.findById(
             reservasAntiguas[i].uidRestaurante
           );
-          const email = "victorhornachos@gmail.com"; //usuarioActualizado.email;
+          const email = usuarioActualizado.email;
           const nombre = usuarioActualizado.nombre;
           const restaurante = restauranteDB.nombre;
           const fecha = usuarioActualizado.reservas[i].fecha;
@@ -690,7 +690,7 @@ const borrarRestaurante = async (req, res) => {
 
       let mailOptions = {
         from: '"La cuchara 🥄 " <lacucharapruebaservices@gmail.com>',
-        to: "victorhornachos@gmail.com", //email,
+        to: email,
         subject: asunto,
         text: mensaje,
       };
